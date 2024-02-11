@@ -45,27 +45,27 @@ int main() {
     for (int i = 0; i < N * N; ++i) {
         if (occurrenceCount[i] != 1) {
             cout << "no" << endl;
-            cout << "The number " << i << " is not present exactly once in the matrix." << endl;
+            //cout << "The number " << i << " is not present exactly once in the matrix." << endl;
             goto cleanup;
         }
     }
 
     if (diagonalSum1 != diagonalSum2) {
         cout << "no" << endl;
-        cout << "The sum of the main diagonal is not equal to the sum of the secondary diagonal." << endl;
+        //cout << "The sum of the main diagonal is not equal to the sum of the secondary diagonal." << endl;
         goto cleanup;
     }
 
     for (int i = 0; i < N; ++i) {
         if (rowSums[i] != diagonalSum1) {
             cout << "no" << endl;
-            cout << "The sum of row " << i << " is not equal to the sum of the main diagonal." << endl;
+            //cout << "The sum of row " << i << " is not equal to the sum of the main diagonal." << endl;
             goto cleanup;
         }
 
         if (colSums[i] != diagonalSum1) {
             cout << "no" << endl;
-            cout << "The sum of column " << i << " is not equal to the sum of the main diagonal." << endl;
+            //cout << "The sum of column " << i << " is not equal to the sum of the main diagonal." << endl;
             goto cleanup;
         }
     }
