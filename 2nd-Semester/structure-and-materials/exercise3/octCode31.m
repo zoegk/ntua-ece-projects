@@ -1,0 +1,17 @@
+T = 300;
+i = 15;
+Nd = (1+i)*10^15;
+Na = 10^19;
+e0 = 8.85*10^(-14);
+erSi = 11.68;
+erGaAs = 13.1;
+q = 1.6*10^(-19);
+niSi = 1.45*10^10;
+niGaAs = 1.8*10^6;
+esSi = erSi*e0;
+esGaAs = erGaAs*e0;
+k = 1.38*10^(-23);
+VbiSi = (k*T/q)*log(Na*Nd/(niSi^2))
+VbiGaAs = (k*T/q)*log(Na*Nd/(niGaAs^2))
+WSi = ((2*esSi*VbiSi/q)*(Na+Nd)/(Na*Nd))^0.5
+WGaAs = ((2*esGaAs*VbiGaAs/q)*(Na+Nd)/(Na*Nd))^0.5
