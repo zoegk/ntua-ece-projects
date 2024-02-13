@@ -1,0 +1,11 @@
+NcGaAs = [(3.22*10^19)*(t./300).^(3./2)];
+k = 8.6173324.*10.^(-5);
+EgGaAs = 1.17 - ((4.73.*10.^(-4).*t.^2)./(t.+636));
+b = EgGaAs./(2.*k.*t);
+nGaAs = NcGaAs.*e.^(-b);
+NvGaAs = [(1.83*10^19)*(t./300).^(3./2)];
+pGaAs = NvGaAs.*e.^(-b);
+plot (t,nGaAs, t, pGaAs, "m");
+xlabel ("T(K)", "fontsize", 10);
+ylabel ("Density in GaAs(cm^-3)", "fontsize", 10);
+legend ("nGaAs", "pGaAs");

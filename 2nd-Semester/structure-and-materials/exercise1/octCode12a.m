@@ -1,0 +1,11 @@
+NcSi = [(3.22*10^19)*(t./300).^(3./2)];
+k = 8.6173324.*10.^(-5);
+EgSi = 1.17 - ((4.73.*10.^(-4).*t.^2)./(t.+636));
+b = EgSi./(2.*k.*t);
+nSi = NcSi.*e.^(-b);
+NvSi = [(1.83*10^19)*(t./300).^(3./2)];
+pSi = NvSi.*e.^(-b);
+plot (t,nSi, t, pSi, "m");
+xlabel ("T(K)", "fontsize", 10);
+ylabel ("Density in Si(cm^-3)", "fontsize", 10);
+legend ("nSi", "pSi");
