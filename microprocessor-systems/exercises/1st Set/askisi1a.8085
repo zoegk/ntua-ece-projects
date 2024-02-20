@@ -1,0 +1,12 @@
+MVI C,08H  ; Load 08h into register C
+LDA 2000H  ; Load contents of memory location 2000h into accumulator
+RAL        ; Rotate accumulator left
+JC 080DH   ; Jump to 080Dh if carry flag is set
+DCR C      ; Decrement the value in register C
+JNZ 0805H  ; Jump to 0805h if zero flag is not set
+MOV A,C    ; Move the value of C into accumulator
+CMA        ; Complement accumulator
+STA 3000h  ; Store contents of accumulator into memory location 3000h
+RST 1      ; Restart the program from address 0000h
+
+END

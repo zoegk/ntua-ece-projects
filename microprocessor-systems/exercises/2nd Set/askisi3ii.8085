@@ -1,0 +1,34 @@
+START:
+	CALL KIND 	;Wait for input from hexadecimal keyboard
+	CPI 00H 	;Check if input is 1
+	JC TURN_OFF 	;If input is less than 1, turn off LEDs and wait for valid input
+	CPI 09H 	;Check if input is 8
+	JNC TURN_OFF 	;If input is greater than 8, turn off LEDs and wait for valid input
+	MOV B,A 	;Save input in B register
+	MVI A,00H 	;Initialize A register with 0
+	DCR B 		;Decrement the input
+	JZ OPEN_ALL 	;If input is 1, open all LEDs and skip the loop
+	INR A 		;Increment A register
+
+REPEAT:
+	DCR B 		;Decrement the input
+	JZ OPEN 	;If input is 0, go to OPEN with the current value of A
+	RLC 		;Rotate left through carry
+	INR A 		;Increment A register
+	JMP REPEAT 	;Repeat until the input is zero
+
+OPEN:
+	STA 3000H 	;Open the LEDs starting from the number that we pressed up to the MSB
+	JMP START 	;Start checking again
+
+OPEN_ALL:
+	MVI A,FFH 	;Set A register to FFH (turn on all LEDs)
+	STA 3000H 	;Turn on all LEDs
+	JMP START 	;Start checking again
+
+TURN_OFF:
+	MVI A,FFH 	;Set A register to FFH (turn off all LEDs)
+	STA 3000H 	;Turn off all LEDs
+	JMP START 	;Start checking again
+
+END 			;End of program

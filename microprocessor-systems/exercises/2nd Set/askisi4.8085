@@ -1,0 +1,64 @@
+START:
+	LDA 2000H ; Load input from dip swu=itches to A
+	MOV B,A ; Save A to register B
+A0_B0:
+	ANI 01H ; A = A AND 00000001
+	MOV C,A ; C = A
+	MOV A,B ; A equal to the input of dip switches
+	ANI 02H ; A = A AND 00000010
+	RRC ; Rotate right to get the output as LSB
+AND0:
+	ANA C ; A AND C
+	MOV D,A ; Save the answer
+A1_B1:
+	MOV A,B 
+	ANI 04H ; A = A AND 00000100
+	MOV C,A ; C = A
+	MOV A,B
+	ANI 08H ; A = A AND 00001000
+	RRC
+AND1:
+	ANA C ; A AND C
+	RRC
+	MOV E,A ; E = (A AND C)
+	RRC
+	ANA D ; (A AND C) AND D
+	ORA E ; Save x1 at 2nd LSB
+	MOV D,A ; Save x0 at LSB
+A2_B2:
+	MOV A,B
+	ANI 10H ; A = A AND 00010000
+	MOV C,A ; C = A
+	MOV A,B
+	ANI 20H ; A = A AND 00100000
+XOR2:
+	RRC
+	XRA C ; A XOR C
+	MOV E,A ; E = A XOR C
+A3_B3:
+	MOV A,B
+	ANI 40H ; A = A AND 01000000	
+	MOV C,A ; C = A 
+	MOV A,B
+	ANI 80H ; A = A AND 10000000
+XOR3:
+	RRC
+	XRA C ; A XOR C
+	RRC
+	RRC
+	MOV B,A ; B = A XOR C
+	RRC
+	ORA D
+	MOV D,A ; Save x3 at 4th LSB
+OR:
+	MOV A,B
+	ORA E ; (A XOR C) OR E
+	RRC
+	RRC
+	ORA D ; Save x2 at 3rd LSB
+LED:
+	CMA ; Inverse logic
+	STA 3000H ; Turn on the correcrt LEDs
+	JMP START ; Start checking again
+
+	END

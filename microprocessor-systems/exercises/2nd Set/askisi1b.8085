@@ -1,0 +1,26 @@
+ORG 0900H    ; set the origin of the program to 0900H
+
+    IN 10H    ; disable memory protection
+    LXI H,0900H  ; set the memory pointer to 0900H
+    MVI B,00H ; initialize the high byte of BC with 0
+    MVI C,80H ; set the loop counter to 80H
+
+COUNT_ONES:
+    MOV A,M ; move the value at the memory location pointed to by H into the accumulator
+    ANI 7FH ; clear the MSB of the accumulator (i.e., set it to 0)
+    ADD B   ; add the high byte of BC to the accumulator
+    MOV B,A ; move the result from the accumulator into the high byte of BC
+    XRA A   ; clear the accumulator
+    MOV A,M ; move the value at the memory location pointed to by H into the accumulator
+    ANI 01H ; check the LSB of the accumulator (i.e., check if it's 1 or 0)
+    RLC     ; rotate the accumulator left, shifting the LSB to the MSB position
+    JNC SKIP_INC ; jump to SKIP_INC label if the LSB is 0
+    INX B   ; increment the high byte of BC if the LSB is 1
+SKIP_INC:
+    INR C   ; increment the loop counter
+    INX H   ; increment the memory pointer
+    JNZ COUNT_ONES ; jump back to COUNT_ONES label if the loop counter is not zero
+
+    HLT      ; halt the program
+
+    END      ; end of the program

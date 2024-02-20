@@ -1,0 +1,22 @@
+ORG 0900H    ; set the origin of the program to 0900H
+
+    IN 10H    ; disable memory protection
+    LXI H,1000H  ; set the memory pointer to 1000H
+    MVI C,50H ; set the loop counter to 50H
+    MVI D,00H ; initialize register D with 0
+
+LOOP2:
+    MOV A,M ; load the value from memory into the accumulator
+    CPI 10H ; compare the value in the accumulator with 10H
+    JC SKIP ; jump to SKIP if the value is less than 10H
+    CPI 60H ; compare the value in the accumulator with 60H
+    JNC SKIP ; jump to SKIP if the value is greater than 60H
+    INR D ; increment register D if the value is between and including 10H and 60H
+SKIP:
+    INX H    ; increment the memory pointer
+    DCR C    ; decrement the loop counter
+    JNZ LOOP2 ; jump to the loop label if the loop counter is not zero
+
+    HLT      ; halt the program
+
+    END      ; end of the program

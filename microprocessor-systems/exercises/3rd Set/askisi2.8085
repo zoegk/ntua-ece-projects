@@ -1,0 +1,61 @@
+  ; Initializations
+  MVI D,40H ; Set threshold K1
+  MVI E,80H ; Set threshold K2
+
+  INR D
+  INR E
+
+  MVI A,10H ; 4 right-most 7-segment displays need to be empty
+  STA 0B00H
+  STA 0B01H
+  STA 0B02H
+  STA 0B03H
+
+  MVI A,0DH ; interrupt mask to allow RST 6.5
+  SIM
+  EI ; enable interrupts
+
+  WAIT:
+    JMP WAIT
+
+  INTR_ROUTINE:
+    POP H ; reduce stack
+    CALL KIND ; read keyboard
+    STA 0B05H
+    RLC
+    RLC
+    RLC
+    RLC ; multiply by 16
+    MOV B,A
+    CALL KIND
+    STA 0B04H
+    ADD B ; get total number
+    MOV B,A
+    PUSH D ;temporarily save D and E
+    LXI D,0B00H ;address for STDM
+    CALL STDM
+    CALL DCD
+    POP D ;restore D and E
+    MOV A,B
+
+    CMP D
+    JC LED0
+    CMP E
+    JC LED1
+
+    MVI A,FBH ; LED2
+    JMP FINISH
+
+  LED0:
+    MVI A,FEH ; LED0
+    JMP FINISH
+
+  LED1:
+    MVI A,FDH ; LED1
+
+  FINISH:
+    STA 3000H
+    EI
+    JMP WAIT
+
+  END

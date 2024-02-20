@@ -1,0 +1,16 @@
+ORG 0900H    ; set the origin of the program to 0900H
+
+    IN 10H    ; disable memory protection
+    MVI A,00H ; initialize the accumulator with 0
+    LXI H,0900H  ; set the memory pointer to 0900H
+    MVI C,80H ; set the loop counter to 80H
+
+LOOP1:
+    MOV M,A ; store the value in the accumulator at the memory address pointed to by H
+    INR A    ; increment the value in the accumulator
+    DCR C    ; decrement the loop counter
+    JNZ LOOP1 ; jump to the loop label if the loop counter is not zero
+
+    HLT      ; halt the program
+
+    END      ; end of the program

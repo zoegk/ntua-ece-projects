@@ -1,0 +1,154 @@
+START:	
+	IN 10H	; remove memory protection
+	LXI H,0A00H	; load HL with the start of the memory
+	MVI B,04H	; simple repeater
+
+LL:	
+	MVI M,10H	; store 'nothing' (4 times)
+	INX H
+	DCR B
+	JNZ LL
+
+L0:	
+	MVI A,FEH	;FEH = 11111110, means select line 0
+	STA 2800H	;store it in 2800H and declare you are processing line 0
+	LDA 1800H	;read the column
+	ANI 07H	;reset the 5 MSBs, because the last 3 have the information of the column
+	MVI C,86H	;if A read is 00000110 then button 
+	CPI 06H	;from column 1 is pressed. So go to
+	JZ DISP	;DISPLAY with C having the code for INSTR_STEP
+	MVI C,85H	;same for FETCH PC
+	CPI 05H	;but now I check if A = 00000101
+	JZ DISP	;means 2nd button is pressed
+
+L1:	
+	MVI A,FDH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,84H	
+	CPI 06H	; RUN	
+	JZ DISP	
+	MVI C,80H	
+	CPI 05H	; FETCH_REG
+	JZ DISP	 
+	MVI C,82H	 
+	CPI 03H	; FETCH_ADDRS
+	JZ DISP
+
+L2:	
+	MVI A,FBH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,00H	
+	CPI 06H	; 0
+	JZ DISP	
+	MVI C,83H	
+	CPI 05H	; STORE/INCR
+	JZ DISP	 
+	MVI C,81H	 
+	CPI 03H	; DECR
+	JZ DISP
+
+L3:	
+	MVI A,F7H
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,01H	; 1
+	CPI 06H	
+	JZ DISP	
+	MVI C,02H	; 2
+	CPI 05H	
+	JZ DISP	 
+	MVI C,03H	; 3
+	CPI 03H	
+	JZ DISP
+
+L4:	
+	MVI A,EFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,04H
+	CPI 06H	; 4
+	JZ DISP
+	MVI C,05H
+	CPI 05H	; 5
+	JZ DISP
+	MVI C,06H
+	CPI 03H	; 6
+	JZ DISP
+
+L5:	
+	MVI A,DFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,07H
+	CPI 06H	; 7
+	JZ DISP
+	MVI C,08H
+	CPI 05H	; 8
+	JZ DISP
+	MVI C,09H
+	CPI 03H	; 9
+	JZ DISP
+
+L6:	
+	MVI A,BFH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,0AH
+	CPI 06H	; A
+	JZ DISP
+	MVI C,0BH
+	CPI 05H	; B
+	JZ DISP
+	MVI C,0CH
+	CPI 03H	; C
+	JZ DISP
+
+L7:	
+	MVI A,7FH
+	STA 2800H	
+	LDA 1800H	 
+	ANI 07H		
+	MVI C,0DH
+	CPI 06H	; D
+	JZ DISP
+	MVI C,0EH
+	CPI 05H	; E
+	JZ DISP
+	MVI C,0FH
+	CPI 03H	; F
+	JZ DISP
+
+	JMP START	; if no button is pressed, check again
+
+DISP:	
+	LXI H,0A04H		
+	MOV A,C	;C has the button's code
+	ANI 0FH	;isolate the 4 LSBs
+	MOV M,A	;store them to 0A00H(first digit from left)
+	INX H		;HL++
+	MOV A,C		
+	ANI F0H	;isolate the 4 MSBs
+	RLC		;shift them to the 4 LSBs
+	RLC			
+	RLC
+	RLC	
+	MOV M,A	;store them to 0A01(second digit from left)
+				
+	LXI D,0A00H	;move the block 0A00 to 0A05 to the memory
+
+	CALL STDM	;where the DCD routine reads
+
+	CALL DCD	;print
+
+
+	JMP START		
+
+END

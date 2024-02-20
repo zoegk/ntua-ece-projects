@@ -1,0 +1,50 @@
+START:
+    LDA 2000H        ; Load input binary number from memory
+    ANI 0FH         ; Mask to get the lower 8 bits only
+    CPI 64H          ; Compare with 100 (decimal)
+    JNC FLASH_LSD    ; If greater than or equal to 100, flash LSDs
+    MVI C,0AH       ; Set up divisor for decimal conversion
+    MOV B,A         ; Copy input number to B
+    LXI H,0000H ; Load memory location 0000H into the H-L pair
+    MVI M,00H   ; Move 0 into memory location 0000H
+    MOV A,M     ; Move the value of memory location 0000H to the A register         
+		   ; Clear accumulator
+    MVI D,00H       ; Set MSD to "0"
+DIV_LOOP:
+    CMP D        ; Compare input number with divisor
+    JC END_DIV_LOOP ; If B < C, exit loop
+    SUB C           ; Subtract divisor from B
+    INR D           ; Increment MSD
+    JMP DIV_LOOP
+END_DIV_LOOP:
+    MOV A,D         ; Move MSD to accumulator
+    ADI 30H         ; Convert MSD to ASCII character
+    STA 3001H       ; Store MSD in memory
+    MOV A,B         ; Move LSD to accumulator
+    ADI 30H         ; Convert LSD to ASCII character
+    STA 3000H       ; Store LSD in memory
+    JMP END         ; Done, halt
+FLASH_LSD:
+    MVI A,0FH      ; Set up LSD flash pattern
+    MVI B,0AH       ; Set up divisor for decimal conversion
+    LXI H,4000H     ; Set up delay counter in memory location 4000H
+    MVI M,0FH      ; Set the MSB of the delay counter to FFH
+    MVI A,C8H      ; Set the LSB of the delay counter to C8H (200 in decimal)
+    STA 4001H       ; Store the LSB of the delay counter in memory location 4001H
+    JMP FLASH       ; Jump to flash routine
+FLASH_MSD:
+    MVI A,20H      ; Set up MSD flash rate delay
+    MVI B,F0H       ; Set up MSD flash pattern
+    JMP FLASH        ; Jump to flash routine
+FLASH:
+    STA 3000H       ; Output MSD
+    MOV D,A         ; Load flash rate delay
+LOOP1:
+    DCX D            ; Decrement delay counter
+    JNZ LOOP         ; Loop until delay is complete
+    STA 3000H           ; Output flash pattern
+    DCX D            ; Reset delay counter
+    JNZ LOOP1         ; Loop until delay is complete
+    JMP START        ; Jump back to main loop
+END:
+    END

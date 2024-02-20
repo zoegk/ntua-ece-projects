@@ -1,0 +1,51 @@
+IN 10H
+LXI B,01F4H
+MVI E,01H
+
+START:
+  ; Load input from memory address 2000H into accumulator A
+  LDA 2000H
+  ; Copy value of A to register D
+  MOV D,A
+  ; Rotate right through carry flag, checking carry to see if MSB is set
+  RRC
+  JC START
+  ; Call delay subroutine DELB
+  CALL DELB
+  ; Copy value of D back to A
+  MOV A,D
+  ; Rotate left through carry flag, checking carry to see if MSB is set
+  RLC
+  JC RIGHT
+
+LEFT:
+  ; Move value of E into A and then take the 1's complement
+  MOV A,E
+  CMA
+  ; Store complement of A in memory location 3000H
+  STA 3000H
+  ; Take 1's complement of A again
+  CMA
+  ; Rotate left through carry flag
+  RLC
+  ; Move result back into E
+  MOV E,A
+  ; Jump back to start of loop
+  JMP START
+
+RIGHT:
+  ; Move value of E into A and then take the 1's complement
+  MOV A,E
+  CMA
+  ; Store complement of A in memory location 3000H
+  STA 3000H
+  ; Take 1's complement of A again
+  CMA
+  ; Rotate right through carry flag
+  RRC
+  ; Move result back into E
+  MOV E,A
+  ; Jump back to start of loop
+  JMP START
+
+END

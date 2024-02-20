@@ -1,0 +1,28 @@
+START:
+	LDA 2000H	;Load input from dip switches to A
+	MVI B,00H	;Set B to 0, B is the current position being checked
+	CPI 01H 	;Check if far-left dip-switch is on
+	JZ TURNON 	;If it's on, turn on far-left LED
+
+CHECK:
+	RRC		;Rotate right through carry, this will move the rightmost bit of A into the carry flag
+	DCR D		;Decrement D, which starts at 8, to keep track of the position being checked
+	JZ TURNOFF 	;If D reaches 0, it means no dip switch is on so turn off all LEDs and start again
+	INR B		;Increase B, which is the current position being checked
+	JNC CHECK	;If the carry flag is 0, it means the current bit being checked is 0 so continue checking
+	MVI A,FEH	;Set A to 11111110 in binary, to turn on the LED at the current position being checked
+	DCR B		;Decrease B to move to the correct bit position for the LED
+
+TURNON:
+	RLC		;Rotate left through carry, this moves the bit in the carry flag to the leftmost position of A
+	DCR B		;Decrease B to move to the correct bit position for the LED
+	JNZ TURNON	;If B is not 0, keep rotating left to reach the correct bit position for the LED
+	STA 3000H	;Store the value of A to memory location 3000H to turn on the LED at the current position
+	JMP START	;Start again from the beginning, to keep checking the dip switches
+
+TURNOFF:
+	MVI A,FFH	;Set A to 11111111 in binary, to turn off all LEDs
+	STA 3000H	;Store the value of A to memory location 3000H to turn off all LEDs
+	JMP START	;Start again from the beginning, to keep checking the dip switches
+
+END

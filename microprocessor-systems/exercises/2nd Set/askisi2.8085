@@ -1,0 +1,53 @@
+	LXI B,0064H	;We call delb with 64Hms = 1/10 sec delay
+
+START:
+	LDA 2000H	;Load input from dip switches to A
+	RLC		;Rotate left to check MSB
+	JNC OFF	;If MSB is off then go to OFF
+	JMP START
+
+OFF:			;We check if the switch is turned on
+	LDA 2000H
+	RLC
+	JC ON_FIRST	;If it's on then go to ON1
+	JMP OFF	;Else wait until it's on
+
+ON_FIRST:			;In order to light up the LEDs we have to switch off
+			;the MSB, but when that happens we'll have to call delb
+	MVI D,C8H	;200 times(we want them on for 20s), that's why D = 200 
+	LDA 2000H
+	RLC
+	JNC OPEN	;If MSB turned off then push button(off-on-off) is activated
+	JMP ON_FIRST
+
+OPEN:
+	LDA 2000H	;If MSB turns on the 20s timer keeps on going, but if that
+	RLC		;happens then we have to check whether it turns off or not.
+	JC ON_AGAIN	;If it does so, then we have to reset the timer
+	MVI A,00H
+	STA 3000H	;Turn on all LEDs
+	CALL DELB
+	DCR D		;Decrease D
+	JNZ OPEN	;If D = 0 then 20s passed
+	MVI A,FFH
+	STA 3000H	;Turn off all LEDs and start checking again
+	JMP OFF
+
+ON_AGAIN:		;Getting here means that if the MSB switch turns off then the 
+	LDA 2000H	;timer has to reset.If the MSB stays on the whole time then we
+	RLC		;repeat the same process as above
+	JNC RESTART
+	MVI A,00H
+	STA 3000H
+	CALL DELB
+	DCR D
+	JNZ ON_AGAIN
+	MVI A,FFH
+	STA 3000H
+	JMP OFF
+
+RESTART:		;If on-off occured while we had the LEDs on then reset the timer
+	MVI D,C8H
+	JMP OPEN
+
+END
